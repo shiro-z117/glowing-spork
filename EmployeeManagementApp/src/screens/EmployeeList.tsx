@@ -2,6 +2,7 @@ import { View, Text, FlatList } from "react-native";
 import { useEffect, useState } from "react";
 import { Employee } from "../types/Employee";
 import { fetchAllEmployees } from "../data/apiData";
+import EmployeeCard from "../components/EmployeeCard";
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -11,17 +12,12 @@ export default function EmployeeList() {
   }, []);
 
   return (
-    <View>
-      <Text>Employee List</Text>
+    <View style={{ flex: 1 }}>
+      {/*TODO: make this sortable by firstname, lastname, and filter by department*/}
       <FlatList
         data={employees}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Text>
-            {item.firstName}
-            {item.lastName}
-          </Text>
-        )}
+        renderItem={({ item }) => <EmployeeCard employee={item} />}
       />
     </View>
   );
