@@ -1,5 +1,6 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { Employee } from "../types/Employee";
+import StatusBadge from "./StatusBadge";
 
 interface EmployeeCardProps {
   employee: Employee;
@@ -23,6 +24,8 @@ export default function EmployeeCard({ employee, onPress }: EmployeeCardProps) {
         <Text style={styles.jobTitle}>Title: {employee.jobTitle}</Text>
         <Text style={styles.department}>Department: {employee.department}</Text>
       </View>
+
+      <StatusBadge isActive={employee.isActive} />
     </TouchableOpacity>
   );
 }
