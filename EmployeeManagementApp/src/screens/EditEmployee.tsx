@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function EditEmployees() {
+export default function EditEmployee() {
   return (
     <View>
-      <Text>Edit Employees</Text>
+      <Text>Edit Employee</Text>
     </View>
   );
 }
