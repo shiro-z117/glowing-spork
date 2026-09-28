@@ -33,7 +33,7 @@ export default function EmployeeCard({ employee, onPress }: EmployeeCardProps) {
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    margin: 4,
+    margin: 2,
     padding: 12,
     borderRadius: 8,
     backgroundColor: "#fff",
