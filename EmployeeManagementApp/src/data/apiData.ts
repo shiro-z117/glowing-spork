@@ -8,7 +8,7 @@ export async function fetchAllEmployees(): Promise<Employee[]> {
     return response.json();
 }
 
-export async function fetchEmployeeById(id: number): Promise<Employee> {
+export async function fetchEmployeeById(id: string): Promise<Employee> {
     const response = await fetch(`https://6ab91fd2f84897980b7269b9.mockapi.io/users/${id}`);
     if (!response.ok) {
         throw new Error("Failed to fetch employee");

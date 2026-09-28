@@ -1,5 +1,5 @@
 export type RootStackParamList = {
     EmployeeList: undefined;
-    EmployeeDetails: { id: number };
-    EditEmployee: { id: number };
+    EmployeeDetails: { id: string };
+    EditEmployee: { id: string };
 };

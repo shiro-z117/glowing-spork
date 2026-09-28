@@ -1,12 +1,18 @@
 import { View, FlatList } from "react-native";
 import { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../types/navigation";
 import { Employee } from "../types/Employee";
 import { fetchAllEmployees, fetchDepartments } from "../data/apiData";
 import EmployeeCard from "../components/EmployeeCard";
 import SearchBar from "../components/SearchBar";
 import FilterDropdown, { SortOption } from "../components/FilterDropdown";
 
+type EmployeeListNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function EmployeeList() {
+  const navigation = useNavigation<EmployeeListNavigationProp>();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -62,7 +68,14 @@ export default function EmployeeList() {
       <FlatList
         data={filteredEmployees}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <EmployeeCard employee={item} />}
+        renderItem={({ item }) => (
+          <EmployeeCard
+            employee={item}
+            onPress={() =>
+              navigation.navigate("EmployeeDetails", { id: item.id })
+            }
+          />
+        )}
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
