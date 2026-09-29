@@ -8,6 +8,9 @@ import { fetchAllEmployees, fetchDepartments } from "../data/apiData";
 import EmployeeCard from "../components/EmployeeCard";
 import SearchBar from "../components/SearchBar";
 import FilterDropdown, { SortOption } from "../components/FilterDropdown";
+import LoadingView from "../components/LoadingView";
+import ErrorView from "../components/ErrorView";
+import EmptyState from "../components/EmptyState";
 
 type EmployeeListNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -15,6 +18,8 @@ export default function EmployeeList() {
   const navigation = useNavigation<EmployeeListNavigationProp>();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [excludedDepartments, setExcludedDepartments] = useState<string[]>([]);
@@ -24,8 +29,15 @@ export default function EmployeeList() {
   });
 
   useEffect(() => {
-    fetchAllEmployees().then(setEmployees);
-    fetchDepartments().then(setDepartments);
+    setLoading(true);
+    setError(false);
+    Promise.all([fetchAllEmployees(), fetchDepartments()])
+      .then(([data1, data2]) => {
+        setEmployees(data1);
+        setDepartments(data2);
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
   }, []);
 
   async function handleRefresh() {
@@ -54,6 +66,14 @@ export default function EmployeeList() {
       return sortOption.direction === "asc" ? result : -result;
     });
 
+  if (loading) {
+    return <LoadingView />;
+  }
+
+  if (error) {
+    return <ErrorView message="Something went wrong loading employees." />;
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
@@ -65,20 +85,30 @@ export default function EmployeeList() {
         onSelectSort={setSortOption}
       />
 
-      <FlatList
-        data={filteredEmployees}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <EmployeeCard
-            employee={item}
-            onPress={() =>
-              navigation.navigate("EmployeeDetails", { id: item.id })
-            }
-          />
-        )}
-        refreshing={refreshing}
-        onRefresh={handleRefresh}
-      />
+      {filteredEmployees.length === 0 ? (
+        <EmptyState
+          message={
+            employees.length === 0
+              ? "No employees found."
+              : "No employees match your search or filters."
+          }
+        />
+      ) : (
+        <FlatList
+          data={filteredEmployees}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <EmployeeCard
+              employee={item}
+              onPress={() =>
+                navigation.navigate("EmployeeDetails", { id: item.id })
+              }
+            />
+          )}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+        />
+      )}
     </View>
   );
 }
