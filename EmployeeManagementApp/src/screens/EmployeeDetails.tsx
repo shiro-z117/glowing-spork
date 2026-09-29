@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    margin: 16,
   },
   infoContainer: {
     width: "100%",
