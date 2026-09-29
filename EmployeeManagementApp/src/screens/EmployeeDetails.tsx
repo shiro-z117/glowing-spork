@@ -1,13 +1,11 @@
-import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
 import { Employee } from "../types/Employee";
 import { fetchEmployeeById } from "../data/apiData";
-
 import LoadingView from "../components/LoadingView";
 import ErrorView from "../components/ErrorView";
-import EmptyState from "../components/EmptyState";
 
 type EmployeeDetailsRouteProp = RouteProp<
   RootStackParamList,
