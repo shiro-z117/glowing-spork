@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
 import { Employee } from "../types/Employee";
-import { fetchEmployeeById } from "../data/apiData";
+import { fetchEmployeeById } from "../services/apiData";
 import LoadingView from "../components/LoadingView";
 import ErrorView from "../components/ErrorView";
 import AddEditButton from "../components/AddEditButton";

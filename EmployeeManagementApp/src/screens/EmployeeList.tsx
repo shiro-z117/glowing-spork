@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigation";
 import { Employee } from "../types/Employee";
-import { fetchAllEmployees, fetchDepartments } from "../data/apiData";
+import { fetchAllEmployees, fetchDepartments } from "../services/apiData";
 import EmployeeCard from "../components/EmployeeCard";
 import SearchBar from "../components/SearchBar";
 import FilterDropdown, { SortOption } from "../components/FilterDropdown";
