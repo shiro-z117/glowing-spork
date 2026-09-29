@@ -6,6 +6,7 @@ import { Employee } from "../types/Employee";
 import { fetchEmployeeById } from "../data/apiData";
 import LoadingView from "../components/LoadingView";
 import ErrorView from "../components/ErrorView";
+import AddEditButton from "../components/AddEditButton";
 
 type EmployeeDetailsRouteProp = RouteProp<
   RootStackParamList,
@@ -80,6 +81,9 @@ export default function EmployeeDetails() {
               <Text style={styles.value}>
                 {employee.isActive ? "Active" : "Inactive"}
               </Text>
+            </View>
+            <View style={{ marginTop: 16 }}>
+              <AddEditButton id={employee.id} />
             </View>
           </View>
         </View>

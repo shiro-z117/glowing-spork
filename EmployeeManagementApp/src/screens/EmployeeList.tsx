@@ -1,4 +1,4 @@
-import { View, FlatList } from "react-native";
+import { View, FlatList, Text, Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -11,6 +11,7 @@ import FilterDropdown, { SortOption } from "../components/FilterDropdown";
 import LoadingView from "../components/LoadingView";
 import ErrorView from "../components/ErrorView";
 import EmptyState from "../components/EmptyState";
+import AddEditButton from "../components/AddEditButton";
 
 type EmployeeListNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -84,6 +85,7 @@ export default function EmployeeList() {
         sortOption={sortOption}
         onSelectSort={setSortOption}
       />
+      <AddEditButton />
 
       {filteredEmployees.length === 0 ? (
         <EmptyState
