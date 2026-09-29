@@ -1,9 +1,13 @@
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
 import { Employee } from "../types/Employee";
 import { fetchEmployeeById } from "../data/apiData";
+
+import LoadingView from "../components/LoadingView";
+import ErrorView from "../components/ErrorView";
+import EmptyState from "../components/EmptyState";
 
 type EmployeeDetailsRouteProp = RouteProp<
   RootStackParamList,
@@ -25,7 +29,9 @@ export default function EmployeeDetails() {
       <Text>Employee Details</Text>
       {employee && (
         <View>
-          <Text>Name: {employee.firstName} {employee.lastName}</Text>
+          <Text>
+            Name: {employee.firstName} {employee.lastName}
+          </Text>
           <Text>Email: {employee.email}</Text>
           <Text>Job Title: {employee.jobTitle}</Text>
           <Text>Department: {employee.department}</Text>
@@ -33,6 +39,12 @@ export default function EmployeeDetails() {
           <Text>Phone: {employee.phone}</Text>
           <Text>Join Date: {employee.joinDate}</Text>
           <Text>Status: {employee.isActive ? "Active" : "Inactive"}</Text>
+
+          <View style={{ height: 300 }}>
+            <LoadingView />
+            <EmptyState />
+            <ErrorView />
+          </View>
         </View>
       )}
     </View>
