@@ -1,7 +1,11 @@
 import { useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, Keyboard, StyleSheet } from "react-native";
 import InputField from "./InputField";
-import { isValidEmail, isValidPhone, isValidName } from "../services/validation";
+import {
+  isValidEmail,
+  isValidPhone,
+  isValidName,
+} from "../services/validation";
 
 export interface EmployeeFormValues {
   firstName: string;
@@ -28,6 +32,38 @@ const emptyValues: EmployeeFormValues = {
   isActive: true,
 };
 
+type FormErrors = Partial<Record<keyof EmployeeFormValues, string>>;
+
+function validateField(
+  key: keyof EmployeeFormValues,
+  values: EmployeeFormValues,
+): string | undefined {
+  switch (key) {
+    case "firstName":
+      return isValidName(values.firstName)
+        ? undefined
+        : "First name is required";
+    case "lastName":
+      return isValidName(values.lastName) ? undefined : "Last name is required";
+    case "email":
+      return isValidEmail(values.email)
+        ? undefined
+        : "Enter a valid email address";
+    case "phone":
+      return isValidPhone(values.phone)
+        ? undefined
+        : "Enter a valid phone number";
+    case "department":
+      return isValidName(values.department)
+        ? undefined
+        : "Department is required";
+    case "jobTitle":
+      return isValidName(values.jobTitle) ? undefined : "Job title is required";
+    default:
+      return undefined;
+  }
+}
+
 export default function EmployeeForm({
   initialValues,
   onSubmit,
@@ -35,9 +71,8 @@ export default function EmployeeForm({
   const [values, setValues] = useState<EmployeeFormValues>(
     initialValues ?? emptyValues,
   );
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof EmployeeFormValues, string>>
-  >({});
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [statusOpen, setStatusOpen] = useState(false);
 
   function updateField<K extends keyof EmployeeFormValues>(
     key: K,
@@ -46,28 +81,32 @@ export default function EmployeeForm({
     setValues((prev) => ({ ...prev, [key]: value }));
   }
 
-  function validate(): boolean {
-    const newErrors: typeof errors = {};
+  function handleFieldDone(key: keyof EmployeeFormValues) {
+    Keyboard.dismiss();
+    const error = validateField(key, values);
+    setErrors((prev) => ({ ...prev, [key]: error }));
+  }
 
-    if (!isValidName(values.firstName))
-      newErrors.firstName = "First name is required";
-    if (!isValidName(values.lastName))
-      newErrors.lastName = "Last name is required";
-    if (!isValidEmail(values.email))
-      newErrors.email = "Enter a valid email address";
-    if (!isValidPhone(values.phone))
-      newErrors.phone = "Enter a valid phone number";
-    if (!isValidName(values.department))
-      newErrors.department = "Department is required";
-    if (!isValidName(values.jobTitle))
-      newErrors.jobTitle = "Job title is required";
-
+  function validateAll(): boolean {
+    const keys: (keyof EmployeeFormValues)[] = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "department",
+      "jobTitle",
+    ];
+    const newErrors: FormErrors = {};
+    keys.forEach((key) => {
+      const error = validateField(key, values);
+      if (error) newErrors[key] = error;
+    });
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
   function handleSubmit() {
-    if (validate()) {
+    if (validateAll()) {
       onSubmit(values);
     }
   }
@@ -78,18 +117,21 @@ export default function EmployeeForm({
         label="First Name"
         value={values.firstName}
         onChangeText={(t) => updateField("firstName", t)}
+        onSubmitEditing={() => handleFieldDone("firstName")}
         error={errors.firstName}
       />
       <InputField
         label="Last Name"
         value={values.lastName}
         onChangeText={(t) => updateField("lastName", t)}
+        onSubmitEditing={() => handleFieldDone("lastName")}
         error={errors.lastName}
       />
       <InputField
         label="Email"
         value={values.email}
         onChangeText={(t) => updateField("email", t)}
+        onSubmitEditing={() => handleFieldDone("email")}
         error={errors.email}
         keyboardType="email-address"
       />
@@ -97,6 +139,7 @@ export default function EmployeeForm({
         label="Phone"
         value={values.phone}
         onChangeText={(t) => updateField("phone", t)}
+        onSubmitEditing={() => handleFieldDone("phone")}
         error={errors.phone}
         keyboardType="phone-pad"
       />
@@ -104,23 +147,50 @@ export default function EmployeeForm({
         label="Department"
         value={values.department}
         onChangeText={(t) => updateField("department", t)}
+        onSubmitEditing={() => handleFieldDone("department")}
         error={errors.department}
       />
       <InputField
         label="Job Title"
         value={values.jobTitle}
         onChangeText={(t) => updateField("jobTitle", t)}
+        onSubmitEditing={() => handleFieldDone("jobTitle")}
         error={errors.jobTitle}
       />
 
-      <Pressable
-        style={styles.statusToggle}
-        onPress={() => updateField("isActive", !values.isActive)}
-      >
-        <Text>
-          Status: {values.isActive ? "Active" : "Inactive"} (tap to toggle)
-        </Text>
-      </Pressable>
+      <View style={styles.statusContainer}>
+        <Text style={styles.statusLabel}>Status</Text>
+
+        <Pressable
+          style={styles.statusButton}
+          onPress={() => setStatusOpen((o) => !o)}
+        >
+          <Text>{values.isActive ? "Active" : "Inactive"}</Text>
+        </Pressable>
+
+        {statusOpen && (
+          <View style={styles.statusMenu}>
+            <Pressable
+              style={styles.statusOption}
+              onPress={() => {
+                updateField("isActive", true);
+                setStatusOpen(false);
+              }}
+            >
+              <Text>Active</Text>
+            </Pressable>
+            <Pressable
+              style={styles.statusOption}
+              onPress={() => {
+                updateField("isActive", false);
+                setStatusOpen(false);
+              }}
+            >
+              <Text>Inactive</Text>
+            </Pressable>
+          </View>
+        )}
+      </View>
 
       <Pressable style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>Submit</Text>
@@ -130,8 +200,33 @@ export default function EmployeeForm({
 }
 
 const styles = StyleSheet.create({
-  statusToggle: {
+  statusContainer: {
     marginBottom: 20,
+  },
+  statusLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  statusButton: {
+    height: 44,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  statusMenu: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    marginTop: 4,
+    backgroundColor: "#fff",
+  },
+  statusOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   submitButton: {
     backgroundColor: "blue",

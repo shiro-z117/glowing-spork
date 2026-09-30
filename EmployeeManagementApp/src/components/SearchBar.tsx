@@ -13,6 +13,7 @@ export default function SearchBar({ value, onChangeText }: SearchBarProps) {
         value={value}
         onChangeText={onChangeText}
         placeholder={"Search"}
+        returnKeyType="done"
       />
     </View>
   );

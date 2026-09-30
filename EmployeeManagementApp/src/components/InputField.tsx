@@ -4,6 +4,7 @@ interface InputFieldProps {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
+  onSubmitEditing?: () => void;
   error?: string;
   keyboardType?: "default" | "email-address" | "phone-pad";
 }
@@ -12,6 +13,7 @@ export default function InputField({
   label,
   value,
   onChangeText,
+  onSubmitEditing,
   error,
   keyboardType = "default",
 }: InputFieldProps) {
@@ -22,7 +24,9 @@ export default function InputField({
         style={[styles.input, error && styles.inputError]}
         value={value}
         onChangeText={onChangeText}
+        onSubmitEditing={onSubmitEditing}
         keyboardType={keyboardType}
+        returnKeyType="done"
         autoCapitalize="none"
       />
       {error && <Text style={styles.error}>{error}</Text>}
