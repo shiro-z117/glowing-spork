@@ -226,7 +226,6 @@ export default function EmployeeForm({
         onChangeText={(t) => updateField("phone", t)}
         onSubmitEditing={() => handleFieldDone("phone")}
         error={errors.phone}
-        keyboardType="phone-pad"
       />
       <InputField
         label="Department"
