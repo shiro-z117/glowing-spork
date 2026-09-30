@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, ScrollView } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
 import EmployeeForm, { EmployeeFormValues } from "../components/EmployeeForm";
@@ -15,7 +15,9 @@ export default function EditEmployee() {
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
-      <EmployeeForm onSubmit={handleSubmit} />
+      <ScrollView>
+        <EmployeeForm onSubmit={handleSubmit} />
+      </ScrollView>
     </View>
   );
 }

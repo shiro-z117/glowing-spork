@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
@@ -32,62 +32,64 @@ export default function EmployeeDetails() {
 
   return (
     <View style={{ flex: 1 }}>
-      {loading && (
-        <View style={styles.centered}>
-          <LoadingView />
-        </View>
-      )}
+      <ScrollView>
+        {loading && (
+          <View style={styles.centered}>
+            <LoadingView />
+          </View>
+        )}
 
-      {!loading && (error || !employee) && (
-        <View style={styles.centered}>
-          <ErrorView message="Something went wrong with loading this employee's information." />
-        </View>
-      )}
+        {!loading && (error || !employee) && (
+          <View style={styles.centered}>
+            <ErrorView message="Something went wrong with loading this employee's information." />
+          </View>
+        )}
 
-      {!loading && employee && (
-        <View style={styles.content}>
-          <Image source={{ uri: employee.avatar }} style={styles.avatar} />
-          <View style={styles.infoContainer}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Name:</Text>
-              <Text style={styles.value}>
-                {employee.firstName} {employee.lastName}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Email:</Text>
-              <Text style={styles.value}> {employee.email}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Job Title:</Text>
-              <Text style={styles.value}> {employee.jobTitle}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Department:</Text>
-              <Text style={styles.value}> {employee.department}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Phone:</Text>
-              <Text style={styles.value}> {employee.phone}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Join Date:</Text>
-              <Text style={styles.value}>
-                {new Date(employee.joinDate).toLocaleDateString()}
-              </Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.label}>Status:</Text>
-              <Text style={styles.value}>
-                {employee.isActive ? "Active" : "Inactive"}
-              </Text>
-            </View>
-            <View style={{ marginTop: 16 }}>
-              <AddEditButton id={employee.id} />
+        {!loading && employee && (
+          <View style={styles.content}>
+            <Image source={{ uri: employee.avatar }} style={styles.avatar} />
+            <View style={styles.infoContainer}>
+              <View style={styles.row}>
+                <Text style={styles.label}>Name:</Text>
+                <Text style={styles.value}>
+                  {employee.firstName} {employee.lastName}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Email:</Text>
+                <Text style={styles.value}> {employee.email}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Job Title:</Text>
+                <Text style={styles.value}> {employee.jobTitle}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Department:</Text>
+                <Text style={styles.value}> {employee.department}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Phone:</Text>
+                <Text style={styles.value}> {employee.phone}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Join Date:</Text>
+                <Text style={styles.value}>
+                  {new Date(employee.joinDate).toLocaleDateString()}
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Status:</Text>
+                <Text style={styles.value}>
+                  {employee.isActive ? "Active" : "Inactive"}
+                </Text>
+              </View>
+              <View style={{ marginTop: 16 }}>
+                <AddEditButton id={employee.id} />
+              </View>
             </View>
           </View>
-        </View>
-      )}
+        )}
+      </ScrollView>
     </View>
   );
 }

@@ -107,11 +107,30 @@ export default function EmployeeForm({
     return Object.keys(newErrors).length === 0;
   }
 
-  function handleSubmit() {
-    if (validateAll()) {
-      onSubmit(values);
-    }
+function capitalizeWords(str: string): string {
+  return str
+    .trim()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function handleSubmit() {
+  if (validateAll()) {
+    onSubmit({
+      ...values,
+      firstName: capitalizeWords(values.firstName),
+      lastName: capitalizeWords(values.lastName),
+      department: capitalizeWords(values.department),
+      jobTitle: capitalizeWords(values.jobTitle),
+    });
   }
+}
+
+function handleReset() {
+  setValues(initialValues ?? emptyValues);
+  setErrors({});
+}
 
   return (
     <View>
@@ -204,6 +223,9 @@ export default function EmployeeForm({
       <Pressable style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitText}>Submit</Text>
       </Pressable>
+      <Pressable style={styles.resetButton} onPress={handleReset}>
+        <Text style={styles.submitText}>Reset</Text>
+      </Pressable>
     </View>
   );
 }
@@ -243,9 +265,18 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 16,
   },
   submitText: {
     color: "#fff",
     fontWeight: "600",
+  },
+  resetButton: {
+    backgroundColor: "red",
+    borderRadius: 8,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 32,
   },
 });
