@@ -8,6 +8,7 @@ import {
   fetchEmployeeById,
   createEmployee,
   updateEmployee,
+  deleteEmployee,
 } from "../services/apiData";
 import EmployeeForm, { EmployeeFormValues } from "../components/EmployeeForm";
 import LoadingView from "../components/LoadingView";
@@ -25,15 +26,15 @@ export default function EditEmployee() {
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState(false);
 
-    useEffect(() => {
-      if (!id) return;
-      setLoading(true);
-      setError(false);
-      fetchEmployeeById(id)
-        .then(setEmployee)
-        .catch(() => setError(true))
-        .finally(() => setLoading(false));
-    }, [id]);
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    setError(false);
+    fetchEmployeeById(id)
+      .then(setEmployee)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, [id]);
 
   async function handleSubmit(values: EmployeeFormValues) {
     try {
@@ -47,6 +48,19 @@ export default function EditEmployee() {
       Alert.alert(
         "Something went wrong",
         "Failed to save employee. Please try again.",
+      );
+    }
+  }
+
+  async function handleDelete() {
+    if (!id) return;
+    try {
+      await deleteEmployee(id);
+      navigation.popToTop();
+    } catch {
+      Alert.alert(
+        "Something went wrong",
+        "Failed to delete employee. Please try again.",
       );
     }
   }
@@ -75,7 +89,11 @@ export default function EditEmployee() {
   return (
     <View style={{ flex: 1, padding: 16 }}>
       <ScrollView>
-        <EmployeeForm initialValues={initialValues} onSubmit={handleSubmit} />
+        <EmployeeForm
+          initialValues={initialValues}
+          onSubmit={handleSubmit}
+          onDelete={id ? handleDelete : undefined}
+        />
       </ScrollView>
     </View>
   );

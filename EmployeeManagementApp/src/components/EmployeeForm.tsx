@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, Pressable, Keyboard, StyleSheet } from "react-native";
 import InputField from "./InputField";
 import {
@@ -21,6 +21,7 @@ export interface EmployeeFormValues {
 interface EmployeeFormProps {
   initialValues?: EmployeeFormValues;
   onSubmit: (values: EmployeeFormValues) => void;
+  onDelete?: () => void;
 }
 
 const emptyValues: EmployeeFormValues = {
@@ -35,6 +36,7 @@ const emptyValues: EmployeeFormValues = {
 };
 
 type FormErrors = Partial<Record<keyof EmployeeFormValues, string>>;
+type PendingAction = "submit" | "reset" | "delete" | null;
 
 function validateField(
   key: keyof EmployeeFormValues,
@@ -66,15 +68,50 @@ function validateField(
   }
 }
 
+function capitalizeWords(str: string): string {
+  return str
+    .trim()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
 export default function EmployeeForm({
   initialValues,
   onSubmit,
+  onDelete,
 }: EmployeeFormProps) {
   const [values, setValues] = useState<EmployeeFormValues>(
     initialValues ?? emptyValues,
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [statusOpen, setStatusOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function clearPendingTimeout() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }
+
+  function armPending(action: PendingAction) {
+    clearPendingTimeout();
+    setPendingAction(action);
+    timeoutRef.current = setTimeout(() => {
+      setPendingAction(null);
+    }, 6000);
+  }
+
+  function cancelPending() {
+    clearPendingTimeout();
+    setPendingAction(null);
+  }
+
+  useEffect(() => {
+    return () => clearPendingTimeout();
+  }, []);
 
   function updateField<K extends keyof EmployeeFormValues>(
     key: K,
@@ -107,33 +144,53 @@ export default function EmployeeForm({
     return Object.keys(newErrors).length === 0;
   }
 
-function capitalizeWords(str: string): string {
-  return str
-    .trim()
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
-function handleSubmit() {
-  if (validateAll()) {
-    onSubmit({
-      ...values,
-      firstName: capitalizeWords(values.firstName),
-      lastName: capitalizeWords(values.lastName),
-      department: capitalizeWords(values.department),
-      jobTitle: capitalizeWords(values.jobTitle),
-    });
+  function performSubmit() {
+    if (validateAll()) {
+      onSubmit({
+        ...values,
+        firstName: capitalizeWords(values.firstName),
+        lastName: capitalizeWords(values.lastName),
+        department: capitalizeWords(values.department),
+        jobTitle: capitalizeWords(values.jobTitle),
+      });
+    }
   }
-}
 
-function handleReset() {
-  setValues(initialValues ?? emptyValues);
-  setErrors({});
-}
+  function performReset() {
+    setValues(initialValues ?? emptyValues);
+    setErrors({});
+  }
+
+  function handleSubmitPress() {
+    if (pendingAction === "submit") {
+      cancelPending();
+      performSubmit();
+    } else {
+      validateAll();
+      armPending("submit");
+    }
+  }
+
+  function handleResetPress() {
+    if (pendingAction === "reset") {
+      cancelPending();
+      performReset();
+    } else {
+      armPending("reset");
+    }
+  }
+
+  function handleDeletePress() {
+    if (pendingAction === "delete") {
+      cancelPending();
+      onDelete?.();
+    } else {
+      armPending("delete");
+    }
+  }
 
   return (
-    <View>
+    <Pressable style={{ flex: 1 }} onPress={cancelPending}>
       <InputField
         label="Avatar URL"
         value={values.avatar}
@@ -220,13 +277,24 @@ function handleReset() {
         )}
       </View>
 
-      <Pressable style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitText}>Submit</Text>
+      <Pressable style={styles.submitButton} onPress={handleSubmitPress}>
+        <Text style={styles.buttonText}>
+          {pendingAction === "submit" ? "Are you sure?" : "Submit"}
+        </Text>
       </Pressable>
-      <Pressable style={styles.resetButton} onPress={handleReset}>
-        <Text style={styles.submitText}>Reset</Text>
+      <Pressable style={styles.resetButton} onPress={handleResetPress}>
+        <Text style={styles.buttonText}>
+          {pendingAction === "reset" ? "Are you sure?" : "Reset"}
+        </Text>
       </Pressable>
-    </View>
+      {onDelete && (
+        <Pressable style={styles.deleteButton} onPress={handleDeletePress}>
+          <Text style={styles.buttonText}>
+            {pendingAction === "delete" ? "Are you sure?" : "Delete"}
+          </Text>
+        </Pressable>
+      )}
+    </Pressable>
   );
 }
 
@@ -267,11 +335,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 16,
   },
-  submitText: {
+  buttonText: {
     color: "#fff",
     fontWeight: "600",
   },
   resetButton: {
+    backgroundColor: "green",
+    borderRadius: 8,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 32,
+  },
+  deleteButton: {
     backgroundColor: "red",
     borderRadius: 8,
     height: 44,
