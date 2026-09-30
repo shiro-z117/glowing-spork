@@ -1,7 +1,8 @@
-import { View, FlatList, Text, Pressable } from "react-native";
-import { useEffect, useState } from "react";
+import { View, FlatList } from "react-native";
+import { useCallback, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
 import { Employee } from "../types/Employee";
 import { fetchAllEmployees, fetchDepartments } from "../services/apiData";
@@ -29,17 +30,19 @@ export default function EmployeeList() {
     direction: "asc",
   });
 
-  useEffect(() => {
-    setLoading(true);
-    setError(false);
-    Promise.all([fetchAllEmployees(), fetchDepartments()])
-      .then(([data1, data2]) => {
-        setEmployees(data1);
-        setDepartments(data2);
-      })
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      setError(false);
+      Promise.all([fetchAllEmployees(), fetchDepartments()])
+        .then(([data1, data2]) => {
+          setEmployees(data1);
+          setDepartments(data2);
+        })
+        .catch(() => setError(true))
+        .finally(() => setLoading(false));
+    }, []),
+  );
 
   async function handleRefresh() {
     setRefreshing(true);

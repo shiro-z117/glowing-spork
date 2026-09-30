@@ -1,6 +1,7 @@
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRoute, RouteProp } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { RootStackParamList } from "../types/navigation";
 import { Employee } from "../types/Employee";
 import { fetchEmployeeById } from "../services/apiData";
@@ -21,14 +22,16 @@ export default function EmployeeDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    setError(false);
-    fetchEmployeeById(id)
-      .then((data) => setEmployee(data))
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      setError(false);
+      fetchEmployeeById(id)
+        .then((data) => setEmployee(data))
+        .catch(() => setError(true))
+        .finally(() => setLoading(false));
+    }, [id]),
+  );
 
   return (
     <View style={{ flex: 1 }}>
