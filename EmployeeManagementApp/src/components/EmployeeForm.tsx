@@ -8,6 +8,7 @@ import {
 } from "../services/validation";
 
 export interface EmployeeFormValues {
+  avatar: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -23,6 +24,7 @@ interface EmployeeFormProps {
 }
 
 const emptyValues: EmployeeFormValues = {
+  avatar: "",
   firstName: "",
   lastName: "",
   email: "",
@@ -113,6 +115,13 @@ export default function EmployeeForm({
 
   return (
     <View>
+      <InputField
+        label="Avatar URL"
+        value={values.avatar}
+        onChangeText={(t) => updateField("avatar", t)}
+        onSubmitEditing={() => handleFieldDone("avatar")}
+        error={errors.avatar}
+      />
       <InputField
         label="First Name"
         value={values.firstName}
