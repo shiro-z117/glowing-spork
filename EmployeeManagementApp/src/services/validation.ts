@@ -7,3 +7,7 @@ export function isValidEmail(email: string): boolean {
 export function isValidPhone(phone: string): boolean {
     return validator.isMobilePhone(phone, "en-US");
 }
+
+export function isValidName(name: string): boolean {
+    return name.trim().length > 0;
+}
